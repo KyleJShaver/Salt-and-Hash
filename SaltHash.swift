@@ -25,10 +25,11 @@ class SaltHash: NSObject {
     var saltLength : Int = 8
     var salt : String = ""
     var hashedPasword : String = ""
+    var numberOfCycles : Int = 1
     
     
     // The standard init will try to automaticallt generate a Salt and hash the password. It will return nil if either the salt or the password is not generated.
-    init?(plaintextPassword plainInput : String, saltLength lengthInput: Int) {
+    init?(plaintextPassword plainInput : String, saltLength lengthInput : Int) {
         super.init()
         plaintextPassword = plainInput
         saltLength = lengthInput
@@ -38,10 +39,16 @@ class SaltHash: NSObject {
         }
     }
     
+    // Convenience initializer that will also allow you to configure the number of hashing cycles
+    convenience init?(plaintextPassword plainInput : String, saltLength lengthInput : Int, numberOfHashCycles cycleInput: Int) {
+        self.init(plaintextPassword: plainInput, saltLength: lengthInput)
+        numberOfCycles = cycleInput
+    }
+    
     // The method that can be used to generate a salt and hash, in case you want to use them independent of creating a SaltHash object. Returns a tuple of the generated salt, then the hashed text
     func saltAndHash(plaintextPassword plainInput : String, saltLength lengthInput: Int) -> (String, String) {
         let generatedSalt = generateSalt(saltLength: lengthInput)
-        let generatedHash = hashString("moo", numberOfCycles: 2);
+        let generatedHash = hashString(plainInput+generatedSalt, numberOfCycles: numberOfCycles);
         return (generatedSalt, generatedHash)
     }
     
